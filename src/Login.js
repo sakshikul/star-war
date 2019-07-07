@@ -5,59 +5,73 @@ import './login.css';
 class Login extends React.Component{
     constructor(props){
         super(props);
-        this.state = { 
+        this.state = {
             isLoaded : false,
             error : null,
             characters : [],
             username : '',
-            pwd : ''
+            password : '',
+            formErrors: {email: '', password: ''},
+            emailValid: false,
+            passwordValid: false,
+            formValid: false,
+            isloggedin: false
         }
         this.handleFunction = this.handleFunction.bind(this)
         this.formDataChange = this.formDataChange.bind(this)
     }
 
     handleFunction(e){
+  e.preventDefault();;
         fetch("https://swapi.co/api/people/")
         .then(res => res.json())
         .then((result) => {
-            this.setState({
-                characters: result.results,
-            })
-            console.log("this.characters",typeof(this.characters))
-            this.state.characters.forEach(
-                function iterator( item ) {
-                    console.log( "forEach:", item, e.target.username, e.target.pwd );
+          this.setState({
+              characters: result.results,
+          })
+          const username=this.state.username
+          const password=this.state.password
+          let loggedin = false
+
+          this.state.characters.forEach(
+                  function iterator( item, ) {
+                    if(item.name===username & item.birth_year===password)
+                    { console.log("logging");
+                      loggedin = true;
+                    }
+                    else {
+                      console.log("")
+                    }
                 },
-                
             );
-//eslint-disable-next-line
-        // console.log("-->",typeof(this.characters))
+            if(loggedin===false)
+            {
+              alert('username/password is incorrect')
+            }
+            else{
+              this.props.history.push(`/search`);
+            }
+            
     })}
 
     formDataChange(e){
-        console.log(e.target.username)
-       this.setState({
-           username : e.target.username,
-           
-
-       })
+      const name = e.target.name;
+      const value = e.target.value;
+      this.setState({[name]: value});
+      console.log(this.state.password,this.state.username)
     }
-  
-
     render(){
-        console.log (typeof(this.state.characters),this.state.characters)
-        const { characters } = this.state
+       
         return(
             <div className = "login">
-               <h1 >hello</h1>
                 <div className = "login__form">
                     <form >
-                        <input onChange = {(event) =>this.formDataChange(event)} value={this.state.username} id="username" name="username" placeholder="user@example.com" type="email"  required/><br/>
-                        <input onChange = {(event) =>this.formDataChange(event)} value={this.state.pwd} id="pass" placeholder="pass" type="password" required /><br/>
+                        <input type="text" onChange = {this.formDataChange} value={this.state.username} id="username" name="username" placeholder="user@example.com" type="username"  required/><br/>
+                        <input type="text" onChange = {this.formDataChange} value={this.state.password} id="password" name="password" placeholder="password" type="password"  required/><br/>
                         <button type="submit" onClick =  {this.handleFunction} className = "login__form--submit">Login</button>
                     </form>
                 </div>
-               
+
             </div>
         )
     }
